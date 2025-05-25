@@ -1,0 +1,197 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  //output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model DUENIO {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  apellido  String
+  cedula    String   @unique
+  telefono  String?
+  correo    String?  @unique
+  ciudad    String?
+  direccion String?
+  contrasena String
+  foto_url  String?
+
+  mascotas  MASCOTA[]
+}
+
+model VETERINARIO {
+  id                Int      @id @default(autoincrement())
+  nombre            String
+  apellido          String
+  cedula_profesional String  @unique
+  telefono          String?
+  correo            String?  @unique
+  rol               Rol
+  fecha_ingreso     DateTime?
+  foto_url          String?
+
+  horarios          VETERINARIO_HORARIO[]
+  excepciones       VETERINARIO_EXCEPCION[]
+  citas             CITA[]
+  eventos           EVENTO[]
+}
+
+enum Rol {
+  Médico_general
+  Cirujano
+  Emergencias
+  Otro
+}
+
+model MASCOTA {
+  id              Int      @id @default(autoincrement())
+  nombre          String
+  especie         String
+  raza            String
+  fecha_nacimiento DateTime?
+  sexo            Sexo
+  peso            Decimal?
+  altura          Decimal?
+  foto_url        String?
+  duenio_id       Int?
+  duenio          DUENIO?  @relation(fields: [duenio_id], references: [id])
+
+  citas           CITA[]
+  historial       HISTORIAL_MEDICO[]
+  eventos         EVENTO[]
+}
+
+enum Sexo {
+  Macho
+  Hembra
+}
+
+model VETERINARIO_HORARIO {
+  id             Int      @id @default(autoincrement())
+  veterinario_id Int
+  dia_semana     DiaSemana
+  hora_inicio    DateTime?
+  hora_fin       DateTime?
+
+  veterinario    VETERINARIO @relation(fields: [veterinario_id], references: [id])
+}
+
+enum DiaSemana {
+  Lunes
+  Martes
+  Miércoles
+  Jueves
+  Viernes
+  Sábado
+  Domingo
+}
+
+model VETERINARIO_EXCEPCION {
+  id             Int      @id @default(autoincrement())
+  veterinario_id Int
+  fecha          DateTime?
+  hora_inicio    DateTime?
+  hora_fin       DateTime?
+  motivo         String?
+  disponible     Boolean
+
+  veterinario    VETERINARIO @relation(fields: [veterinario_id], references: [id])
+}
+
+model CITA {
+  id             Int      @id @default(autoincrement())
+  mascota_id     Int
+  veterinario_id Int
+  razon_cita     String?
+  estado         EstadoCita @default(Pendiente)
+  fecha          DateTime?
+  hora           DateTime?
+  descripcion    String?
+
+  mascota        MASCOTA     @relation(fields: [mascota_id], references: [id])
+  veterinario    VETERINARIO @relation(fields: [veterinario_id], references: [id])
+}
+
+enum EstadoCita {
+  Pendiente
+  Cancelada
+  Confirmada
+}
+
+model CATEGORIA_ATENCION {
+  id       Int    @id @default(autoincrement())
+  nombre   Categoria
+  historiales HISTORIAL_MEDICO[]
+  eventos     EVENTO[]
+}
+
+enum Categoria {
+  Vacuna
+  Desparasitación
+  Control_general
+  Cirugía
+  Otro
+}
+
+model HISTORIAL_MEDICO {
+  id           Int      @id @default(autoincrement())
+  titulo       String?
+  categoria_id Int
+  fecha        DateTime?
+  mascota_id   Int
+
+  categoria    CATEGORIA_ATENCION @relation(fields: [categoria_id], references: [id])
+  mascota      MASCOTA            @relation(fields: [mascota_id], references: [id])
+}
+
+model EVENTO {
+  id           Int      @id @default(autoincrement())
+  titulo       String?
+  categoria_id Int
+  mascota_id   Int
+  veterinario_id Int
+  fecha        DateTime?
+  hora         DateTime?
+  descripcion  String?
+
+  categoria    CATEGORIA_ATENCION @relation(fields: [categoria_id], references: [id])
+  mascota      MASCOTA            @relation(fields: [mascota_id], references: [id])
+  veterinario  VETERINARIO        @relation(fields: [veterinario_id], references: [id])
+}
+
+model PAIS {
+  id      Int     @id @default(autoincrement())
+  nombre  String  @unique
+  ciudades CIUDAD[]
+}
+
+model CIUDAD {
+  id      Int    @id @default(autoincrement())
+  nombre  String
+  pais_id Int
+  pais    PAIS   @relation(fields: [pais_id], references: [id])
+}
+
+model ESPECIE {
+  id     Int    @id @default(autoincrement())
+  nombre String @unique
+
+  razas  RAZA[]
+}
+
+model RAZA {
+  id         Int     @id @default(autoincrement())
+  nombre     String
+  especie_id Int
+  especie    ESPECIE @relation(fields: [especie_id], references: [id])
+}
