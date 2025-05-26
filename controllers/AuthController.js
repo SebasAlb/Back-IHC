@@ -48,11 +48,11 @@ export const registerUser = async (req, res) => {
 // LOGIN DE USUARIO
 export const loginUser = async (req, res) => {
   try {
-    const { cedula, contrasena } = req.body;
+    const { correo, contrasena } = req.body;
 
     // Buscar el dueño por cédula
     const user = await prisma.dUENIO.findUnique({
-      where: { cedula },
+      where: { correo },
     });
 
     if (!user) {
