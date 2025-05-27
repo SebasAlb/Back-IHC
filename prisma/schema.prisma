@@ -20,7 +20,7 @@ model DUENIO {
   apellido  String
   cedula    String   @unique
   telefono  String?
-  correo    String?  @unique
+  correo    String  @unique
   ciudad    String?
   direccion String?
   contrasena String

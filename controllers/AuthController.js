@@ -50,6 +50,10 @@ export const loginUser = async (req, res) => {
   try {
     const { correo, contrasena } = req.body;
 
+    if (!correo || !contrasena) {
+      return res.status(400).json({ error: 'Correo y contraseña son obligatorios' });
+    }
+
     // Buscar el dueño por cédula
     const user = await prisma.dUENIO.findUnique({
       where: { correo },
