@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/create', crearMascota);
 router.get('/Owner/:duenio_id', obtenerMascotasPorDuenio);
-router.post('/update', actualizarMascota);
+router.post('/update/:id', actualizarMascota);
 router.post('/history/Owner', obtenerHistorialPorMascotaYDuenio);
 
 export default router;
