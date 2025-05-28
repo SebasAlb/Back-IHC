@@ -58,12 +58,12 @@ model MASCOTA {
   nombre          String
   especie         String
   raza            String
-  fecha_nacimiento DateTime?
+  fecha_nacimiento DateTime
   sexo            Sexo
-  peso            Decimal?
-  altura          Decimal?
+  peso            Decimal
+  altura          Decimal
   foto_url        String?
-  duenio_id       Int?
+  duenio_id       Int
   duenio          DUENIO?  @relation(fields: [duenio_id], references: [id])
 
   citas           CITA[]
