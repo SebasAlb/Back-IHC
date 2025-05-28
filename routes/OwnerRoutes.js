@@ -3,6 +3,6 @@ import { actualizarDuenio } from '../controllers/OwnerController.js';
 
 const router = express.Router();
 
-router.put('/update/:id', actualizarDuenio);
+router.post('/update/:id', actualizarDuenio);
 
 export default router;
