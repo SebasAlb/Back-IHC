@@ -63,7 +63,7 @@ export const actualizarMascota = async (req, res) => {
 
 // OBTENER HISTORIAL MÉDICO DE UNA MASCOTA POR DUEÑO
 export const obtenerHistorialPorMascotaYDuenio = async (req, res) => {
-  const { duenio_id, mascota_id } = req.params;
+  const { duenio_id, mascota_id } = req.body;
   try {
     const historial = await prisma.hISTORIAL_MEDICO.findMany({
       where: {

@@ -4,8 +4,8 @@ import { crearMascota, obtenerMascotasPorDuenio, actualizarMascota, obtenerHisto
 const router = express.Router();
 
 router.post('/create', crearMascota);
-router.post('/pet/Owner', obtenerMascotasPorDuenio);
-router.put('/update', actualizarMascota);
+router.get('/Owner/:duenio_id', obtenerMascotasPorDuenio);
+router.post('/update', actualizarMascota);
 router.post('/history/Owner', obtenerHistorialPorMascotaYDuenio);
 
 export default router;
