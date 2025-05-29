@@ -45,6 +45,59 @@ export const registerUser = async (req, res) => {
   }
 };
 
+export const changePassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { contrasenaActual, nuevaContrasena } = req.body;
+
+    // Validación básica
+    if (!contrasenaActual || !nuevaContrasena) {
+      return res.status(400).json({ error: 'Debe ingresar la contraseña actual y la nueva contraseña' });
+    }
+
+    if (nuevaContrasena.length < 6) {
+      return res.status(400).json({ error: 'La nueva contraseña debe tener al menos 6 caracteres' });
+    }
+
+    // Buscar dueño por ID
+    const existingUser = await prisma.dUENIO.findUnique({
+      where: {
+        id: parseInt(id)
+      }
+    });
+
+    if (!existingUser) {
+      return res.status(404).json({ error: 'Dueño no encontrado' });
+    }
+
+    // Verificar que la contraseña actual coincida
+    const isMatch = await bcrypt.compare(contrasenaActual, existingUser.contrasena);
+
+    if (!isMatch) {
+      return res.status(401).json({ error: 'La contraseña actual no es correcta' });
+    }
+
+    // Hashear la nueva contraseña
+    const hashedNewPassword = await bcrypt.hash(nuevaContrasena, 10);
+
+    // Actualizar contraseña
+    await prisma.dUENIO.update({
+      where: {
+        id: parseInt(id)
+      },
+      data: {
+        contrasena: hashedNewPassword
+      }
+    });
+
+    res.status(200).json({ message: 'Contraseña actualizada exitosamente' });
+
+  } catch (error) {
+    console.error('Error al cambiar la contraseña:', error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+}
+
 // LOGIN DE USUARIO
 export const loginUser = async (req, res) => {
   try {
