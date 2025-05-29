@@ -135,3 +135,59 @@ export const obtenerHistorialPorMascotaYDuenio = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// OBTENER EVENTOS, CITAS E HISTORIAL DE UNA MASCOTA
+export const obtenerDetallesMascota = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const mascota = await prisma.mASCOTA.findUnique({
+      where: {
+        id: parseInt(id),
+      },
+      include: {
+        citas: true,
+        eventos: true,
+        historial: true,
+      },
+    });
+
+    if (!mascota) {
+      return res.status(404).json({ error: 'Mascota no encontrada' });
+    }
+
+    const resultado = {
+      mascota_id: mascota.id,
+      nombre_mascota: mascota.nombre,
+      citas: mascota.citas.map((cita) => ({
+        tipo: 'Cita',
+        id: cita.id,
+        razon_cita: cita.razon_cita,
+        fecha: cita.fecha,
+        hora: cita.hora,
+        estado: cita.estado,
+        descripcion: cita.descripcion,
+      })),
+      eventos: mascota.eventos.map((evento) => ({
+        tipo: 'Evento',
+        id: evento.id,
+        titulo: evento.titulo,
+        fecha: evento.fecha,
+        hora: evento.hora,
+        descripcion: evento.descripcion,
+      })),
+      historial_medico: mascota.historial.map((registro) => ({
+        tipo: 'Historial',
+        id: registro.id,
+        titulo: registro.titulo,
+        fecha: registro.fecha,
+        categoria_id: registro.categoria_id,
+      })),
+    };
+
+    res.status(200).json(resultado);
+  } catch (error) {
+    console.error('Error al obtener detalles de la mascota:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
