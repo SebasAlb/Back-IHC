@@ -52,7 +52,7 @@ export const obtenerMascotasPorDuenio = async (req, res) => {
 
   try {
     const mascotas = await prisma.mASCOTA.findMany({
-      where: { duenio_id: parseInt(duenio_id) },
+      where: { duenio_id: parseInt(duenio_id),  deleted_at: null },
       include: {
         duenio: true,
         citas: true,
@@ -189,5 +189,41 @@ export const obtenerDetallesMascota = async (req, res) => {
   } catch (error) {
     console.error('Error al obtener detalles de la mascota:', error);
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const eliminarMascota = async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    // Verificar si la mascota existe y no ha sido borrada ya
+    const mascotaExistente = await prisma.mASCOTA.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!mascotaExistente) {
+      return res.status(404).json({ error: 'Mascota no encontrada.' });
+    }
+
+    if (mascotaExistente.deleted_at) {
+      return res.status(400).json({ error: 'La mascota ya ha sido eliminada lógicamente.' });
+    }
+
+    // Borrado lógico
+    const mascotaActualizada = await prisma.mASCOTA.update({
+      where: { id: parseInt(id) },
+      data: {
+        deleted_at: new Date()
+      }
+    });
+
+    res.status(200).json({
+      mensaje: 'Mascota eliminada lógicamente.',
+      mascota: mascotaActualizada
+    });
+
+  } catch (error) {
+    console.error('Error al eliminar mascota lógicamente:', error);
+    res.status(500).json({ error: 'Error interno del servidor.' });
   }
 };

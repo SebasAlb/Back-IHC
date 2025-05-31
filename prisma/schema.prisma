@@ -65,6 +65,7 @@ model MASCOTA {
   foto_url        String?
   duenio_id       Int
   duenio          DUENIO?  @relation(fields: [duenio_id], references: [id])
+  deleted_at       DateTime?
 
   citas           CITA[]
   historial       HISTORIAL_MEDICO[]

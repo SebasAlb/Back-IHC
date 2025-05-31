@@ -24,6 +24,7 @@ export const obtenerCitasYEventosPorDuenio = async (req, res) => {
     const mascotas = await prisma.mASCOTA.findMany({
       where: {
         duenio_id: parseInt(id),
+        deleted_at: null
       },
       include: {
         citas: true,
