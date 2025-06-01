@@ -141,6 +141,7 @@ enum Categoria {
   Desparasitación
   Control_general
   Cirugía
+  Cumpleaños
   Otro
 }
 
