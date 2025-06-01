@@ -146,9 +146,22 @@ export const obtenerDetallesMascota = async (req, res) => {
         id: parseInt(id),
       },
       include: {
-        citas: true,
-        eventos: true,
-        historial: true,
+        citas: {
+          include: {
+            veterinario: true,
+          },
+        },
+        eventos: {
+          include: {
+            veterinario: true,
+            categoria: true,
+          },
+        },
+        historial: {
+          include: {
+            categoria: true,
+          },
+        },
       },
     });
 
@@ -167,6 +180,17 @@ export const obtenerDetallesMascota = async (req, res) => {
         hora: cita.hora,
         estado: cita.estado,
         descripcion: cita.descripcion,
+        veterinario: {
+          id: cita.veterinario.id,
+          nombre: cita.veterinario.nombre,
+          apellido: cita.veterinario.apellido,
+          cedula_profesional: cita.veterinario.cedula_profesional,
+          telefono: cita.veterinario.telefono,
+          correo: cita.veterinario.correo,
+          rol: cita.veterinario.rol,
+          fecha_ingreso: cita.veterinario.fecha_ingreso,
+          foto_url: cita.veterinario.foto_url,
+        },
       })),
       eventos: mascota.eventos.map((evento) => ({
         tipo: 'Evento',
@@ -175,13 +199,31 @@ export const obtenerDetallesMascota = async (req, res) => {
         fecha: evento.fecha,
         hora: evento.hora,
         descripcion: evento.descripcion,
+        categoria: {
+          id: evento.categoria.id,
+          nombre: evento.categoria.nombre,
+        },
+        veterinario: {
+          id: evento.veterinario.id,
+          nombre: evento.veterinario.nombre,
+          apellido: evento.veterinario.apellido,
+          cedula_profesional: evento.veterinario.cedula_profesional,
+          telefono: evento.veterinario.telefono,
+          correo: evento.veterinario.correo,
+          rol: evento.veterinario.rol,
+          fecha_ingreso: evento.veterinario.fecha_ingreso,
+          foto_url: evento.veterinario.foto_url,
+        },
       })),
       historial_medico: mascota.historial.map((registro) => ({
         tipo: 'Historial',
         id: registro.id,
         titulo: registro.titulo,
         fecha: registro.fecha,
-        categoria_id: registro.categoria_id,
+        categoria: {
+          id: registro.categoria.id,
+          nombre: registro.categoria.nombre,
+        },
       })),
     };
 
@@ -191,6 +233,7 @@ export const obtenerDetallesMascota = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
 
 export const eliminarMascota = async (req, res) => {
   const { id } = req.params;
