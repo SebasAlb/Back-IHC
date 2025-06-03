@@ -24,11 +24,20 @@ export const obtenerCitasYEventosPorDuenio = async (req, res) => {
     const mascotas = await prisma.mASCOTA.findMany({
       where: {
         duenio_id: parseInt(id),
-        deleted_at: null
+        deleted_at: null,
       },
       include: {
-        citas: true,
-        eventos: true,
+        citas: {
+          include: {
+            veterinario: true,
+          },
+        },
+        eventos: {
+          include: {
+            veterinario: true,
+            categoria: true,
+          },
+        },
       },
     });
 
@@ -43,6 +52,19 @@ export const obtenerCitasYEventosPorDuenio = async (req, res) => {
         hora: cita.hora,
         estado: cita.estado,
         descripcion: cita.descripcion,
+        veterinario: cita.veterinario
+          ? {
+              id: cita.veterinario.id,
+              nombre: cita.veterinario.nombre,
+              apellido: cita.veterinario.apellido,
+              cedula_profesional: cita.veterinario.cedula_profesional,
+              telefono: cita.veterinario.telefono,
+              correo: cita.veterinario.correo,
+              rol: cita.veterinario.rol,
+              fecha_ingreso: cita.veterinario.fecha_ingreso,
+              foto_url: cita.veterinario.foto_url,
+            }
+          : null,
       })),
       eventos: mascota.eventos.map((evento) => ({
         tipo: 'Evento',
@@ -51,6 +73,25 @@ export const obtenerCitasYEventosPorDuenio = async (req, res) => {
         fecha: evento.fecha,
         hora: evento.hora,
         descripcion: evento.descripcion,
+        categoria: evento.categoria
+          ? {
+              id: evento.categoria.id,
+              nombre: evento.categoria.nombre,
+            }
+          : null,
+        veterinario: evento.veterinario
+          ? {
+              id: evento.veterinario.id,
+              nombre: evento.veterinario.nombre,
+              apellido: evento.veterinario.apellido,
+              cedula_profesional: evento.veterinario.cedula_profesional,
+              telefono: evento.veterinario.telefono,
+              correo: evento.veterinario.correo,
+              rol: evento.veterinario.rol,
+              fecha_ingreso: evento.veterinario.fecha_ingreso,
+              foto_url: evento.veterinario.foto_url,
+            }
+          : null,
       })),
     }));
 
